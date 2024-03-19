@@ -138,7 +138,7 @@ export const Details = ({
                     {selectedPitch.name}
                   </div>
                   <ScrollArea>
-                    <div className="text-foreground max-h-[600px] px-4 text-justify text-lg whitespace-pre-wrap">
+                    <div className="text-foreground max-h-[600px] px-4 text-lg text-justify whitespace-pre-wrap">
                       {selectedPitch.content}
                     </div>
                   </ScrollArea>
