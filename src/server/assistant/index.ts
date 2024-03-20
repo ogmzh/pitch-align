@@ -1,13 +1,14 @@
 import OpenAI from "openai";
 
 import { CreatePitch, SelectThesis } from "@/server/db/schema";
-import { AnalyzePitchResponse } from "@/shared/types";
+import { AnalyzePitchResponse, GPTModel } from "@/shared/types";
 
 const openai = new OpenAI();
 
 export const analyzePitch = async (
   pitch: CreatePitch,
-  theses: SelectThesis[]
+  theses: SelectThesis[],
+  model: GPTModel
 ): Promise<AnalyzePitchResponse | null> => {
   const prompt = {
     request: {
@@ -55,7 +56,7 @@ export const analyzePitch = async (
         content: JSON.stringify(prompt),
       },
     ],
-    model: "gpt-4-turbo-preview",
+    model,
   });
 
   return completion.choices[0].message.content

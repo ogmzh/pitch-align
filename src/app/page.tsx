@@ -18,6 +18,7 @@ import {
 } from "@/server/db/actions/thesis";
 import { createUser, userExists, userHasTheses } from "@/server/db/actions/user";
 import { CreatePitch, CreateThesis } from "@/server/db/schema";
+import { GPTModel } from "../shared/types";
 
 export default async function Home() {
   const createThesisAction = async (thesis: CreateThesis) => {
@@ -68,14 +69,14 @@ export default async function Home() {
     return await userHasTheses(userId);
   }
 
-  const submitPitchAction = async (pitch: CreatePitch) => {
+  const submitPitchAction = async (pitch: CreatePitch, model: GPTModel) => {
     "use server";
     const theses = await getThesesForUser(pitch.userId);
     if (!theses || !theses.length) {
       alert("No theses for this user");
       return;
     } else {
-      const analysis = await analyzePitch(pitch, theses);
+      const analysis = await analyzePitch(pitch, theses, model);
       if (analysis) {
         await createPitchAnalysis({
           pitch,
@@ -104,7 +105,7 @@ export default async function Home() {
       </div>
       <div className="flex w-full flex-col items-center justify-center gap-5 sm:flex-row">
         <AddThesisDialog createThesis={createThesisAction} />
-        <AddPitchDialog submitPitch={submitPitchAction} userHasTheses={userHasThesesAction} />
+        <AddPitchDialog submitPitch={submitPitchAction}  userHasTheses={userHasThesesAction} />
       </div>
       <Details
         userHasTheses={userHasThesesAction}

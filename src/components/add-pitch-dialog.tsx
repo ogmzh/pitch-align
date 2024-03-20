@@ -13,12 +13,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CreatePitch } from "@/server/db/schema";
+import { GPTModel } from "@/shared/types";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
 type AddPitchDialogProps = {
-  submitPitch: (pitch: CreatePitch) => Promise<void>;
+  submitPitch: (pitch: CreatePitch, model: GPTModel) => Promise<void>;
   userHasTheses: (userId: string) => Promise<boolean>;
 };
 
@@ -32,6 +42,7 @@ export function AddPitchDialog({
   const [pitchName, setPitchName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
+  const [model, setModel] = useState<GPTModel>("gpt-4");
 
   useEffect(() => {
     if (!isOpen) {
@@ -48,11 +59,14 @@ export function AddPitchDialog({
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      await submitPitch({
-        content: text,
-        userId: localStorage.getItem("pitch-align-uuid") ?? "",
-        name: pitchName,
-      });
+      await submitPitch(
+        {
+          content: text,
+          userId: localStorage.getItem("pitch-align-uuid") ?? "",
+          name: pitchName,
+        },
+        model
+      );
     } catch (e) {
       console.warn("Something bad happened...", e);
     } finally {
@@ -60,7 +74,6 @@ export function AddPitchDialog({
       setIsOpen(false);
     }
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild disabled={disabled}>
@@ -90,6 +103,23 @@ export function AddPitchDialog({
           onChange={(e) => setText(e.target.value)}
         />
         <DialogFooter>
+          <Select
+            value={model}
+            onValueChange={(value) => setModel(value as GPTModel)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a model" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Models</SelectLabel>
+                <SelectItem value="gpt-3.5-turbo">GPT 3.5 Turbo</SelectItem>
+                <SelectItem value="gpt-4">GPT 4</SelectItem>
+                <SelectItem value="gpt-4-turbo-preview">
+                  GPT 4 Turbo Preview
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Button
             size="lg"
             type="submit"
