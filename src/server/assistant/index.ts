@@ -55,7 +55,7 @@ export const analyzePitch = async (
         content: JSON.stringify(prompt),
       },
     ],
-    model: "gpt-4",
+    model: "gpt-4-turbo-preview",
   });
 
   return completion.choices[0].message.content
